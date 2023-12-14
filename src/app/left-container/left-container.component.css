@@ -125,8 +125,14 @@
   font-size: smaller;
   font-weight: 500;
 }
+
+.left-container-rain-stats-value,
+.left-containertemp-summary-value {
+  font-size: 1.5rem;
+}
 .left-container-rain-stats-img{
   margin-right: 10px;
+  width: 2rem;
 }
 .left-container-location-details{
   flex: 4;
@@ -135,15 +141,16 @@
 .left-container-location-img{
   margin-top: 20px;
   margin-bottom: 30px;
+
 }
 .left-container-location-img img{
   width: 200px;
-  height: 70px;
+  height: auto;
   border-radius: 20px;
 }
 .left-container-location-name{
-  margin-top: -80px;
+  margin-top: -20px;
   font-size: medium;
   font-weight: bold;
-  color: #ffffff;
+  color: #222;
 }

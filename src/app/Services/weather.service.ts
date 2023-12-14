@@ -1,12 +1,12 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { LocationDetails } from '../Models/LocationDetails';
 import { WeatherDetails } from '../Models/WeatherDetails';
 import { TemperatureData } from '../Models/TemperatureData';
 import { TodayData } from '../Models/TodayData';
 import { WeekData } from '../Models/WeekData';
 import { TodaysHighlight } from '../Models/TodaysHighlight';
-import { Observable } from 'rxjs';
 import { EnvironmentalVariables } from '../Environment/EnvironmentVariables';
 
 @Injectable({
@@ -26,8 +26,8 @@ export class WeatherService {
   todaysHighlight?:TodaysHighlight;//Right-Container Data
 
   //variables to be used for API calls
-  cityName:string = 'Mumbai';
-  language:string = 'en-US';
+  cityName:string = 'Antananarivo';
+  language:string = 'en-fr';
   date:string = '20200622';
   units:string = 'm';
 
@@ -153,6 +153,8 @@ export class WeatherService {
     })
   }
 
+  
+
   getWeatherReport(date:string, latitude:number,longitude:number,language:string,units:string):Observable<WeatherDetails>{
     return this.httpClient.get<WeatherDetails>(EnvironmentalVariables.weatherApiForecastBaseURL,{
       headers: new HttpHeaders()
@@ -175,6 +177,8 @@ export class WeatherService {
     var latitude = 0;
     var longitude = 0;
 
+    
+
     this.getLocationDetails(this.cityName,this.language).subscribe({
       next:(response)=>{
         this.locationDetails = response;
@@ -190,11 +194,42 @@ export class WeatherService {
         }) 
       }
     });
-
-    
-
-
-
   }
 
+  getCurrentLocation(): Observable<GeolocationPosition> {
+    return new Observable((observer) => {
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            observer.next(position);
+            observer.complete();
+          },
+          (error) => observer.error(error)
+        );
+      } else {
+        observer.error('La géolocalisation n\'est pas prise en charge par ce navigateur.');
+      }
+    });
+  }
+
+  getWeatherForCurrentLocation(): void {
+    this.getCurrentLocation().subscribe({
+      next: (position: GeolocationPosition) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        this.getWeatherReport(this.date, latitude, longitude, this.language, this.units).subscribe({
+          next: (response) => {
+            this.weatherDetails = response;
+            this.prepareData();
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Erreur de géolocalisation :', error);
+        // Gérer l'erreur ici (par exemple, afficher un message à l'utilisateur ou utiliser une ville par défaut)
+      }
+    });
+  }
+  
 }
